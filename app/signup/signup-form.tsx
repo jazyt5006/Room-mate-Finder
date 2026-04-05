@@ -1,15 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
+import { formatAuthError } from "@/lib/auth-errors";
 import {
   validateEmail,
   validatePassword,
   validatePasswordMatch,
 } from "@/lib/auth-validation";
+import { supabase } from "@/lib/supabaseClient";
 
 export function SignupForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,6 +24,8 @@ export function SignupForm() {
     form?: string;
   }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [signupNotice, setSignupNotice] = useState<string | null>(null);
 
   const runValidation = useCallback(() => {
     const e = validateEmail(email);
@@ -34,18 +40,50 @@ export function SignupForm() {
     return !e && !p && !c;
   }, [email, password, confirmPassword]);
 
-  function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setSubmitted(true);
-    if (!runValidation()) return;
+    setSignupNotice(null);
     setErrors((prev) => ({ ...prev, form: undefined }));
+    if (!runValidation()) return;
+
+    setLoading(true);
+    try {
+      const trimmed = email.trim();
+      const { data, error } = await supabase.auth.signUp({
+        email: trimmed,
+        password,
+      });
+      if (error) {
+        setErrors((prev) => ({
+          ...prev,
+          form: formatAuthError(error),
+        }));
+        return;
+      }
+      if (data.session) {
+        router.push("/profile");
+        router.refresh();
+        return;
+      }
+      setSignupNotice(
+        "Check your email for a confirmation link, then sign in."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   function onEmailChange(v: string) {
     setEmail(v);
     if (submitted) {
-      setErrors((prev) => ({ ...prev, email: validateEmail(v) }));
+      setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(v),
+        form: undefined,
+      }));
     }
+    setSignupNotice(null);
   }
 
   function onPasswordChange(v: string) {
@@ -55,8 +93,10 @@ export function SignupForm() {
         ...prev,
         password: validatePassword(v),
         confirmPassword: validatePasswordMatch(v, confirmPassword),
+        form: undefined,
       }));
     }
+    setSignupNotice(null);
   }
 
   function onConfirmChange(v: string) {
@@ -65,8 +105,10 @@ export function SignupForm() {
       setErrors((prev) => ({
         ...prev,
         confirmPassword: validatePasswordMatch(password, v),
+        form: undefined,
       }));
     }
+    setSignupNotice(null);
   }
 
   return (
@@ -92,6 +134,14 @@ export function SignupForm() {
             role="alert"
           >
             {errors.form}
+          </p>
+        )}
+        {signupNotice && (
+          <p
+            className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900"
+            role="status"
+          >
+            {signupNotice}
           </p>
         )}
 
@@ -185,9 +235,10 @@ export function SignupForm() {
 
         <button
           type="submit"
-          className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
+          disabled={loading}
+          className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
         >
-          Sign up
+          {loading ? "Creating account…" : "Sign up"}
         </button>
       </form>
     </AuthShell>

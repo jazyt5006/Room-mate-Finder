@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
+import { formatAuthError } from "@/lib/auth-errors";
 import { validateEmail, validatePassword } from "@/lib/auth-validation";
+import { supabase } from "@/lib/supabaseClient";
 
 export function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{
@@ -14,6 +18,7 @@ export function LoginForm() {
     form?: string;
   }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const runValidation = useCallback(() => {
     const e = validateEmail(email);
@@ -26,19 +31,38 @@ export function LoginForm() {
     return !e && !p;
   }, [email, password]);
 
-  function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setSubmitted(true);
-    if (!runValidation()) return;
-    // Placeholder until backend auth exists
     setErrors((prev) => ({ ...prev, form: undefined }));
+    if (!runValidation()) return;
+
+    setLoading(true);
+    try {
+      const trimmed = email.trim();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: trimmed,
+        password,
+      });
+      if (error) {
+        setErrors((prev) => ({
+          ...prev,
+          form: formatAuthError(error),
+        }));
+        return;
+      }
+      router.push("/profile");
+      router.refresh();
+    } finally {
+      setLoading(false);
+    }
   }
 
   function onEmailChange(v: string) {
     setEmail(v);
     if (submitted) {
       const e = validateEmail(v);
-      setErrors((prev) => ({ ...prev, email: e }));
+      setErrors((prev) => ({ ...prev, email: e, form: undefined }));
     }
   }
 
@@ -46,7 +70,7 @@ export function LoginForm() {
     setPassword(v);
     if (submitted) {
       const p = validatePassword(v);
-      setErrors((prev) => ({ ...prev, password: p }));
+      setErrors((prev) => ({ ...prev, password: p, form: undefined }));
     }
   }
 
@@ -132,9 +156,10 @@ export function LoginForm() {
 
         <button
           type="submit"
-          className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
+          disabled={loading}
+          className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
         >
-          Log in
+          {loading ? "Signing in…" : "Log in"}
         </button>
       </form>
     </AuthShell>
