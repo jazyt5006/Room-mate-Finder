@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useCallback, useId, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
+import { upsertProfile } from "@/lib/profiles";
+import { supabase } from "@/lib/supabaseClient";
 import {
   validateBranch,
   validateCgpa,
@@ -106,6 +108,9 @@ export function ProfileForm() {
     hostel?: string;
   }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const setSlider = useCallback(
     (field: SliderField, n: number) => {
@@ -131,10 +136,44 @@ export function ProfileForm() {
     return !e.name && !e.branch && !e.year && !e.cgpa && !e.hostel;
   }
 
-  function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
+    setSaveSuccess(false);
+    setSaveError(null);
     setSubmitted(true);
     if (!runValidation()) return;
+
+    setSaving(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        setSaveError("Sign in to save your profile.");
+        return;
+      }
+
+      const { error } = await upsertProfile({
+        id: session.user.id,
+        full_name: name.trim(),
+        branch: branch.trim(),
+        year: Number(year),
+        cgpa: Number(cgpa),
+        hostel_preference: hostel,
+        cleanliness,
+        sleep_cycle: sleepCycle,
+        social_habits: socialHabits,
+      });
+
+      if (error) {
+        setSaveError(error.message);
+        return;
+      }
+      setSaveSuccess(true);
+    } finally {
+      setSaving(false);
+    }
   }
 
   function patchField<K extends keyof typeof errors>(
@@ -163,6 +202,22 @@ export function ProfileForm() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        {saveError && (
+          <p
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+            role="alert"
+          >
+            {saveError}
+          </p>
+        )}
+        {saveSuccess && (
+          <p
+            className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900"
+            role="status"
+          >
+            Profile saved.
+          </p>
+        )}
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label
@@ -343,9 +398,10 @@ export function ProfileForm() {
 
         <button
           type="submit"
-          className="w-full rounded-full bg-zinc-900 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
+          disabled={saving}
+          className="w-full rounded-full bg-zinc-900 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
         >
-          Save profile
+          {saving ? "Saving…" : "Save profile"}
         </button>
       </form>
     </AuthShell>
