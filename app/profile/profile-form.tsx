@@ -15,11 +15,29 @@ import {
 const HOSTEL_OPTIONS = [
   { value: "", label: "Select preference" },
   { value: "none", label: "No preference" },
+
+  { value: "a", label: "Hostel A" },
+  { value: "b", label: "Hostel B" },
+  { value: "c", label: "Hostel C" },
+  { value: "d", label: "Hostel D" },
+  { value: "e", label: "Hostel E" },
+  { value: "f", label: "Hostel F" },
+  { value: "g", label: "Hostel G" },
+  { value: "h", label: "Hostel H" },
+  { value: "i", label: "Hostel I" },
   { value: "j", label: "Hostel J" },
   { value: "k", label: "Hostel K" },
   { value: "l", label: "Hostel L" },
   { value: "m", label: "Hostel M" },
   { value: "n", label: "Hostel N" },
+  { value: "o", label: "Hostel O" },
+
+  { value: "pg", label: "Hostel - PG" }, // P
+  { value: "q", label: "Hostel Q" },
+
+  { value: "frf", label: "Hostel FRF" },
+  { value: "frg", label: "Hostel FRG" },
+
   { value: "other", label: "Other / off-campus" },
 ] as const;
 
