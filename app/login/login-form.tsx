@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { formatAuthError } from "@/lib/auth-errors";
-import { validateEmail, validatePassword } from "@/lib/auth-validation";
+import { validatePassword, validateThaparEmail } from "@/lib/auth-validation";
 import { supabase } from "@/lib/supabaseClient";
 
 export function LoginForm() {
@@ -17,7 +17,6 @@ export function LoginForm() {
     password?: string;
     form?: string;
   }>({});
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -32,35 +31,21 @@ export function LoginForm() {
     };
   }, [router]);
 
-  const runValidation = useCallback(() => {
-    const e = validateEmail(email);
-    const p = validatePassword(password);
-    setErrors({
-      email: e,
-      password: p,
-      form: undefined,
-    });
-    return !e && !p;
-  }, [email, password]);
-
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
-    setSubmitted(true);
-    setErrors((prev) => ({ ...prev, form: undefined }));
-    if (!runValidation()) return;
+    const emailError = validateThaparEmail(email);
+    const passwordError = validatePassword(password);
+    setErrors({ email: emailError, password: passwordError, form: undefined });
+    if (emailError || passwordError) return;
 
     setLoading(true);
     try {
-      const trimmed = email.trim();
       const { error } = await supabase.auth.signInWithPassword({
-        email: trimmed,
+        email: email.trim(),
         password,
       });
       if (error) {
-        setErrors((prev) => ({
-          ...prev,
-          form: formatAuthError(error),
-        }));
+        setErrors((prev) => ({ ...prev, form: formatAuthError(error) }));
         return;
       }
       router.push("/profile");
@@ -72,24 +57,18 @@ export function LoginForm() {
 
   function onEmailChange(v: string) {
     setEmail(v);
-    if (submitted) {
-      const e = validateEmail(v);
-      setErrors((prev) => ({ ...prev, email: e, form: undefined }));
-    }
+    setErrors((prev) => ({ ...prev, email: undefined, form: undefined }));
   }
 
   function onPasswordChange(v: string) {
     setPassword(v);
-    if (submitted) {
-      const p = validatePassword(v);
-      setErrors((prev) => ({ ...prev, password: p, form: undefined }));
-    }
+    setErrors((prev) => ({ ...prev, password: undefined, form: undefined }));
   }
 
   return (
     <AuthShell
       title="Welcome back"
-      subtitle="Sign in to continue your search for next semester."
+      subtitle="Sign in with your verified Thapar email and password."
       footer={
         <>
           Don&apos;t have an account?{" "}
@@ -103,6 +82,10 @@ export function LoginForm() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        <div className="rounded-2xl border border-teal-100 bg-teal-50/70 px-4 py-3 text-sm text-teal-900">
+          Only verified <span className="font-semibold">@thapar.edu</span>{" "}
+          accounts can sign in.
+        </div>
         {errors.form && (
           <p
             className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
@@ -128,8 +111,9 @@ export function LoginForm() {
             onChange={(e) => onEmailChange(e.target.value)}
             aria-invalid={errors.email ? true : undefined}
             aria-describedby={errors.email ? "login-email-error" : undefined}
-            className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+            className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
             placeholder="you@thapar.edu"
+            disabled={loading}
           />
           {errors.email && (
             <p id="login-email-error" className="mt-1.5 text-sm text-red-600">
@@ -156,8 +140,9 @@ export function LoginForm() {
             aria-describedby={
               errors.password ? "login-password-error" : undefined
             }
-            className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-            placeholder="••••••••"
+            className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+            placeholder="Enter your password"
+            disabled={loading}
           />
           {errors.password && (
             <p id="login-password-error" className="mt-1.5 text-sm text-red-600">
@@ -171,7 +156,7 @@ export function LoginForm() {
           disabled={loading}
           className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
         >
-          {loading ? "Signing in…" : "Log in"}
+          {loading ? "Signing in..." : "Log in"}
         </button>
       </form>
     </AuthShell>
