@@ -38,8 +38,19 @@ export function SignupForm() {
         router.replace("/profile");
       }
     });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return;
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+        router.replace("/profile");
+      }
+    });
+
     return () => {
       active = false;
+      subscription.unsubscribe();
     };
   }, [router]);
 
