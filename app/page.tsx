@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthCta } from "@/components/auth-cta";
 
 type NavItem = { href: string; label: string; route?: boolean };
 
@@ -55,19 +56,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/login"
-              className="hidden text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 sm:inline"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800"
-            >
-              Get started
-            </Link>
-
+            <AuthCta />
             <details className="relative md:hidden">
               <summary className="list-none cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm [&::-webkit-details-marker]:hidden">
                 Menu
