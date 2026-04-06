@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { formatAuthError } from "@/lib/auth-errors";
 import { validateEmail, validatePassword } from "@/lib/auth-validation";
@@ -19,6 +19,18 @@ export function LoginForm() {
   }>({});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) {
+        router.replace("/profile");
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
   const runValidation = useCallback(() => {
     const e = validateEmail(email);

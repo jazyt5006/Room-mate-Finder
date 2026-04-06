@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { formatAuthError } from "@/lib/auth-errors";
 import {
-  validateEmail,
   validatePassword,
   validatePasswordMatch,
+  validateThaparEmail,
 } from "@/lib/auth-validation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -25,10 +25,21 @@ export function SignupForm() {
   }>({});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [signupNotice, setSignupNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) {
+        router.replace("/profile");
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
   const runValidation = useCallback(() => {
-    const e = validateEmail(email);
+    const e = validateThaparEmail(email);
     const p = validatePassword(password);
     const c = validatePasswordMatch(password, confirmPassword);
     setErrors({
@@ -43,7 +54,6 @@ export function SignupForm() {
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setSubmitted(true);
-    setSignupNotice(null);
     setErrors((prev) => ({ ...prev, form: undefined }));
     if (!runValidation()) return;
 
@@ -61,14 +71,8 @@ export function SignupForm() {
         }));
         return;
       }
-      if (data.session) {
-        router.push("/profile");
-        router.refresh();
-        return;
-      }
-      setSignupNotice(
-        "Check your email for a confirmation link, then sign in."
-      );
+      router.push("/profile");
+      router.refresh();
     } finally {
       setLoading(false);
     }
@@ -79,11 +83,10 @@ export function SignupForm() {
     if (submitted) {
       setErrors((prev) => ({
         ...prev,
-        email: validateEmail(v),
+        email: validateThaparEmail(v),
         form: undefined,
       }));
     }
-    setSignupNotice(null);
   }
 
   function onPasswordChange(v: string) {
@@ -96,7 +99,6 @@ export function SignupForm() {
         form: undefined,
       }));
     }
-    setSignupNotice(null);
   }
 
   function onConfirmChange(v: string) {
@@ -108,7 +110,6 @@ export function SignupForm() {
         form: undefined,
       }));
     }
-    setSignupNotice(null);
   }
 
   return (
@@ -134,14 +135,6 @@ export function SignupForm() {
             role="alert"
           >
             {errors.form}
-          </p>
-        )}
-        {signupNotice && (
-          <p
-            className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900"
-            role="status"
-          >
-            {signupNotice}
           </p>
         )}
 
