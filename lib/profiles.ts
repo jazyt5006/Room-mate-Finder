@@ -18,6 +18,14 @@ export async function upsertProfile(row: ProfileRow) {
   return supabase.from("profiles").upsert(row, { onConflict: "id" });
 }
 
+export async function fetchProfileById(userId: string) {
+  return supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle();
+}
+
 export function profileToCompatibilityTraits(
   row: ProfileRow
 ): CompatibilityTraits {

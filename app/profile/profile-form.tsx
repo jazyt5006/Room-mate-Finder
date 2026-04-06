@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useId, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useId, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
-import { upsertProfile } from "@/lib/profiles";
+import { fetchProfileById, upsertProfile } from "@/lib/profiles";
 import { supabase } from "@/lib/supabaseClient";
 import {
   validateBranch,
@@ -108,6 +109,7 @@ function SliderRow({
 }
 
 export function ProfileForm() {
+  const router = useRouter();
   const formId = useId();
   const [name, setName] = useState("");
   const [branch, setBranch] = useState("");
@@ -128,7 +130,49 @@ export function ProfileForm() {
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [checkingExisting, setCheckingExisting] = useState(true);
+  const [initialCheckError, setInitialCheckError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function checkExistingProfile() {
+      setCheckingExisting(true);
+      setInitialCheckError(null);
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!active) return;
+      if (!session?.user) {
+        setInitialCheckError("Sign in to create your profile.");
+        setCheckingExisting(false);
+        return;
+      }
+
+      const { data, error } = await fetchProfileById(session.user.id);
+      if (!active) return;
+
+      if (error) {
+        setInitialCheckError(error.message);
+        setCheckingExisting(false);
+        return;
+      }
+
+      if (data?.id) {
+        router.replace("/matches");
+        return;
+      }
+
+      setCheckingExisting(false);
+    }
+
+    void checkExistingProfile();
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
   const setSlider = useCallback(
     (field: SliderField, n: number) => {
@@ -156,7 +200,7 @@ export function ProfileForm() {
 
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
-    setSaveSuccess(false);
+    if (saving || checkingExisting) return;
     setSaveError(null);
     setSubmitted(true);
     if (!runValidation()) return;
@@ -188,7 +232,8 @@ export function ProfileForm() {
         setSaveError(error.message);
         return;
       }
-      setSaveSuccess(true);
+      router.push("/matches");
+      router.refresh();
     } finally {
       setSaving(false);
     }
@@ -220,20 +265,28 @@ export function ProfileForm() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        {checkingExisting && (
+          <p
+            className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700"
+            role="status"
+          >
+            Checking your profile status...
+          </p>
+        )}
+        {initialCheckError && (
+          <p
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+            role="alert"
+          >
+            {initialCheckError}
+          </p>
+        )}
         {saveError && (
           <p
             className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
             role="alert"
           >
             {saveError}
-          </p>
-        )}
-        {saveSuccess && (
-          <p
-            className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900"
-            role="status"
-          >
-            Profile saved.
           </p>
         )}
         <div className="grid gap-5 sm:grid-cols-2">
@@ -416,7 +469,7 @@ export function ProfileForm() {
 
         <button
           type="submit"
-          disabled={saving}
+          disabled={saving || checkingExisting || Boolean(initialCheckError)}
           className="w-full rounded-full bg-zinc-900 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
         >
           {saving ? "Saving…" : "Save profile"}
