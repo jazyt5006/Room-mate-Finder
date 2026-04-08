@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { calculateCompatibilityScore } from "@/lib/compatibility-score";
 import { sampleYou } from "@/lib/dummy-users";
@@ -152,20 +153,12 @@ function MatchesEmptyState() {
         No matches yet
       </h2>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-600">
-        Once students add their profiles, they will show up here ranked by how
-        well their habits align with yours. Be the first to go live—or invite
-        friends to join.
+        You're one of the first ones here! Once other students add their profiles, they will show up ranked by how well their habits align with yours. 
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Link
-          href="/profile"
-          className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
-        >
-          Complete your profile
-        </Link>
-        <Link
           href="/signup"
-          className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:ring-offset-2"
+          className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-zinc-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:ring-offset-2"
         >
           Invite others to sign up
         </Link>
@@ -180,10 +173,12 @@ function MatchesEmptyState() {
 }
 
 export function MatchesView() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ranked, setRanked] = useState<RankedProfile[]>([]);
   const [baselineNote, setBaselineNote] = useState("");
+  const pathname = usePathname();
 
   useEffect(() => {
     let cancelled = false;
@@ -196,11 +191,35 @@ export function MatchesView() {
         data: { session },
       } = await supabase.auth.getSession();
 
+      if (!session?.user) {
+        if (!cancelled && pathname !== "/login") {
+          router.replace("/login");
+        }
+        return;
+      }
+
+      const { data: mine, error: mineError } = await supabase
+        .from("profiles")
+        .select("id, cleanliness, sleep_cycle, social_habits, hostel_preference, cgpa, gender, branch, year")
+        .eq("id", session.user.id)
+        .single();
+
+      if (mineError || !mine || !mine.gender || !mine.branch) {
+        if (!cancelled && pathname !== "/profile") {
+          router.replace("/profile");
+        }
+        return;
+      }
+
       const { data: rows, error: fetchError } = await supabase
         .from("profiles")
         .select(
-          "id, full_name, branch, year, cgpa, hostel_preference, cleanliness, sleep_cycle, social_habits"
-        );
+          "id, full_name, branch, year, cgpa, hostel_preference, cleanliness, sleep_cycle, social_habits, gender"
+        )
+        .eq("gender", mine.gender)
+        .eq("hostel_preference", mine.hostel_preference)
+        .eq("year", mine.year)
+        .neq("id", session.user.id);
 
       if (cancelled) return;
 
@@ -211,27 +230,12 @@ export function MatchesView() {
         return;
       }
 
-      const list = (rows ?? []) as ProfileRow[];
+      const others = (rows ?? []) as ProfileRow[];
 
-      let baseline = sampleYou;
-      let note =
-        "Compared to a sample profile (same defaults as the profile form demo). Sign in and save your profile to compare against yours.";
+      let baseline = profileToCompatibilityTraits(mine as ProfileRow);
+      let note = "Compared to your saved profile. You are not shown in the list below.";
 
-      if (session?.user) {
-        const mine = list.find((p) => p.id === session.user.id);
-        if (mine) {
-          baseline = profileToCompatibilityTraits(mine);
-          note =
-            "Compared to your saved profile. You are not shown in the list below.";
-        } else {
-          note =
-            "You are signed in but have no saved profile yet—using sample traits for scoring. Complete your profile for personalized match %.";
-        }
-      }
 
-      const others = session?.user
-        ? list.filter((p) => p.id !== session.user.id)
-        : list;
 
       const scored: RankedProfile[] = others.map((user) => ({
         ...user,
@@ -282,6 +286,7 @@ export function MatchesView() {
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">
           Compatibility matches
         </h1>
+
         {!loading && baselineNote ? (
           <p className="mt-2 max-w-xl text-sm text-zinc-600">{baselineNote}</p>
         ) : null}

@@ -12,6 +12,7 @@ export type ProfileRow = {
   cleanliness: number;
   sleep_cycle: number;
   social_habits: number;
+  gender: string;
 };
 
 export async function upsertProfile(row: ProfileRow) {
@@ -21,7 +22,7 @@ export async function upsertProfile(row: ProfileRow) {
 export async function fetchProfileById(userId: string) {
   return supabase
     .from("profiles")
-    .select("id")
+    .select("id, branch, gender")
     .eq("id", userId)
     .maybeSingle();
 }
@@ -34,5 +35,6 @@ export function profileToCompatibilityTraits(
     cleanliness: row.cleanliness,
     sleepCycle: row.sleep_cycle,
     socialHabits: row.social_habits,
+    branch: row.branch,
   };
 }

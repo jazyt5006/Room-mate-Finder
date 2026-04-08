@@ -23,3 +23,9 @@ export function validateCgpa(value: string): string | undefined {
   if (n < 0 || n > 10) return "CGPA must be between 0 and 10.";
   return undefined;
 }
+
+export function validateGender(value: string): string | undefined {
+  if (!value) return "Select your gender.";
+  if (value !== "Male" && value !== "Female") return "Invalid gender selection.";
+  return undefined;
+}

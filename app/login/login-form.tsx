@@ -21,18 +21,34 @@ export function LoginForm() {
 
   useEffect(() => {
     let active = true;
-    void supabase.auth.getSession().then(({ data }) => {
+    void supabase.auth.getSession().then(async ({ data }) => {
       if (active && data.session) {
-        router.replace("/profile");
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id, gender, branch")
+          .eq("id", data.session.user.id)
+          .single();
+        if (active) {
+          const complete = profile && profile.gender && profile.branch;
+          router.replace(complete ? "/matches" : "/profile");
+        }
       }
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!active) return;
       if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
-        router.replace("/profile");
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id, gender, branch")
+          .eq("id", session.user.id)
+          .single();
+        if (active) {
+          const complete = profile && profile.gender && profile.branch;
+          router.replace(complete ? "/matches" : "/profile");
+        }
       }
     });
 
@@ -59,7 +75,13 @@ export function LoginForm() {
         setErrors((prev) => ({ ...prev, form: formatAuthError(error) }));
         return;
       }
-      router.push("/profile");
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id, gender, branch")
+        .eq("id", (await supabase.auth.getSession()).data.session?.user.id)
+        .single();
+      const complete = profile && profile.gender && profile.branch;
+      router.push(complete ? "/matches" : "/profile");
       router.refresh();
     } finally {
       setLoading(false);

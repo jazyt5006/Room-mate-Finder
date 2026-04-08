@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { fetchProfileById, upsertProfile } from "@/lib/profiles";
@@ -11,7 +11,30 @@ import {
   validateCgpa,
   validateName,
   validateYear,
+  validateGender,
 } from "@/lib/profile-validation";
+
+const BRANCH_OPTIONS = [
+  { value: "", label: "Select branch" },
+  { value: "COE", label: "Computer Engineering (COE)" },
+  { value: "COPC", label: "Computer Science & Engineering (COPC)" },
+  { value: "COBS", label: "Computer Science and Business Systems (COBS)" },
+  { value: "DSAI", label: "Artificial Intelligence and Data Science (DSAI)" },
+  { value: "EEC", label: "Electrical and Computer Engineering (EEC)" },
+  { value: "ECE", label: "Electronics & Communication Engineering (ECE)" },
+  { value: "ENC", label: "Electronics and Computer Engineering (ENC)" },
+  { value: "RAI", label: "Robotics and Artificial Intelligence (RAI)" },
+  { value: "EVD", label: "Electronics Engineering (VLSI Design and Technology) (EVD)" },
+  { value: "EIC", label: "Electronics (Instrumentation & Control) Engineering (EIC)" },
+  { value: "MEE", label: "Mechanical Engineering (MEE)" },
+  { value: "MEC", label: "Mechatronics (MEC)" },
+  { value: "CHE", label: "Chemical Engineering (CHE)" },
+  { value: "CIE", label: "Civil Engineering (CIE)" },
+  { value: "CCA", label: "Civil Engineering with Computer Applications (CCA)" },
+  { value: "ELE", label: "Electrical Engineering (ELE)" },
+  { value: "BME", label: "Biomedical Engineering (BME)" },
+  { value: "BT", label: "Biotechnology (BT)" },
+] as const;
 
 const HOSTEL_OPTIONS = [
   { value: "", label: "Select preference" },
@@ -116,6 +139,7 @@ export function ProfileForm() {
   const [year, setYear] = useState("");
   const [cgpa, setCgpa] = useState("");
   const [hostel, setHostel] = useState("");
+  const [gender, setGender] = useState("");
   const [cleanliness, setCleanliness] = useState(3);
   const [sleepCycle, setSleepCycle] = useState(3);
   const [socialHabits, setSocialHabits] = useState(3);
@@ -126,12 +150,14 @@ export function ProfileForm() {
     year?: string;
     cgpa?: string;
     hostel?: string;
+    gender?: string;
   }>({});
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [checkingExisting, setCheckingExisting] = useState(true);
   const [initialCheckError, setInitialCheckError] = useState<string | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     let active = true;
@@ -160,8 +186,10 @@ export function ProfileForm() {
         return;
       }
 
-      if (data?.id) {
-        router.replace("/matches");
+      if (data?.id && data?.gender && data?.branch) {
+        if (pathname !== "/matches") {
+          router.replace("/matches");
+        }
         return;
       }
 
@@ -193,9 +221,10 @@ export function ProfileForm() {
       year: validateYear(year),
       cgpa: validateCgpa(cgpa),
       hostel: !hostel ? "Select a hostel preference." : undefined,
+      gender: validateGender(gender),
     };
     setErrors(e);
-    return !e.name && !e.branch && !e.year && !e.cgpa && !e.hostel;
+    return !e.name && !e.branch && !e.year && !e.cgpa && !e.hostel && !e.gender;
   }
 
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
@@ -223,6 +252,7 @@ export function ProfileForm() {
         year: Number(year),
         cgpa: Number(cgpa),
         hostel_preference: hostel,
+        gender,
         cleanliness,
         sleep_cycle: sleepCycle,
         social_habits: socialHabits,
@@ -323,19 +353,23 @@ export function ProfileForm() {
             >
               Branch
             </label>
-            <input
+            <select
               id={`${formId}-branch`}
               name="branch"
-              type="text"
               value={branch}
               onChange={(e) => {
                 setBranch(e.target.value);
                 patchField("branch", e.target.value, validateBranch);
               }}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-              placeholder="e.g. COE, ECE"
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               aria-invalid={errors.branch ? true : undefined}
-            />
+            >
+              {BRANCH_OPTIONS.map((o) => (
+                <option key={o.value || "empty"} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
             {errors.branch && (
               <p className="mt-1.5 text-sm text-red-600">{errors.branch}</p>
             )}
@@ -367,6 +401,33 @@ export function ProfileForm() {
             </select>
             {errors.year && (
               <p className="mt-1.5 text-sm text-red-600">{errors.year}</p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor={`${formId}-gender`}
+              className="block text-sm font-medium text-zinc-700"
+            >
+              Gender
+            </label>
+            <select
+              id={`${formId}-gender`}
+              name="gender"
+              value={gender}
+              onChange={(e) => {
+                setGender(e.target.value);
+                patchField("gender", e.target.value, validateGender);
+              }}
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              aria-invalid={errors.gender ? true : undefined}
+            >
+              <option value="">Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            {errors.gender && (
+              <p className="mt-1.5 text-sm text-red-600">{errors.gender}</p>
             )}
           </div>
 
