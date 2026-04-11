@@ -184,7 +184,7 @@ export function SignupForm() {
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-teal-700 underline-offset-4 hover:text-teal-800 hover:underline"
+            className="font-semibold text-purple-600 underline-offset-4 hover:text-purple-700 hover:underline"
           >
             Log in
           </Link>
@@ -196,7 +196,7 @@ export function SignupForm() {
         className="space-y-5"
         noValidate
       >
-        <div className="rounded-2xl border border-teal-100 bg-teal-50/70 px-4 py-3 text-sm text-teal-900">
+        <div className="rounded-2xl border border-purple-100 bg-purple-50/70 px-4 py-3 text-sm text-purple-900 font-medium">
           Only <span className="font-semibold">@thapar.edu</span> email
           addresses are allowed.
         </div>
@@ -233,7 +233,7 @@ export function SignupForm() {
             onChange={(e) => onEmailChange(e.target.value)}
             aria-invalid={errors.email ? true : undefined}
             aria-describedby={errors.email ? "signup-email-error" : undefined}
-            className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+            className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
             placeholder="you@thapar.edu"
             disabled={step === "verify" || signupLoading || verifyLoading || resendLoading}
           />
@@ -264,7 +264,7 @@ export function SignupForm() {
                 aria-describedby={
                   errors.password ? "signup-password-error" : undefined
                 }
-                className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
                 placeholder="At least 8 characters"
                 disabled={signupLoading}
               />
@@ -295,7 +295,7 @@ export function SignupForm() {
                     ? "signup-confirm-password-error"
                     : undefined
                 }
-                className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
                 placeholder="Repeat your password"
                 disabled={signupLoading}
               />
@@ -327,7 +327,7 @@ export function SignupForm() {
               onChange={(e) => onOtpChange(e.target.value)}
               aria-invalid={errors.otp ? true : undefined}
               aria-describedby={errors.otp ? "signup-otp-error" : undefined}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-center text-lg tracking-[0.25em] text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-lg tracking-[0.25em] text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
               placeholder="000000"
               disabled={verifyLoading || resendLoading}
             />
@@ -343,7 +343,7 @@ export function SignupForm() {
           <button
             type="submit"
             disabled={signupLoading}
-            className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
+            className="w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-500 py-3.5 text-base font-bold text-white shadow-xl shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
           >
             {signupLoading ? "Creating account..." : "Sign up"}
           </button>
@@ -352,7 +352,7 @@ export function SignupForm() {
             <button
               type="submit"
               disabled={verifyLoading || resendLoading}
-              className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
+              className="w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-500 py-3.5 text-base font-bold text-white shadow-xl shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             >
               {verifyLoading ? "Verifying..." : "Verify email and continue"}
             </button>
@@ -360,7 +360,7 @@ export function SignupForm() {
               type="button"
               onClick={() => void handleResendCode()}
               disabled={verifyLoading || resendLoading}
-              className="w-full rounded-full border border-teal-300 bg-teal-50 py-3 text-sm font-semibold text-teal-800 transition hover:bg-teal-100 disabled:pointer-events-none disabled:opacity-60"
+              className="w-full rounded-full border border-purple-300 bg-purple-50 py-3 text-sm font-semibold text-purple-800 transition hover:bg-purple-100 disabled:pointer-events-none disabled:opacity-60"
             >
               {resendLoading ? "Resending code..." : "Resend verification code"}
             </button>

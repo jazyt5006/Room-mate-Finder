@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-  title: "Sign in | Thapar Roommate Finder",
+  title: "Sign in | TIET Roomie",
   description:
-    "Sign in to Thapar Roommate Finder to continue your search for next semester.",
+    "Sign in to TIET Roomie to continue your search for next semester.",
 };
 
 export default function LoginPage() {

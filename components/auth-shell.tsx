@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { RevealOnScroll } from "@/components/reveal-on-scroll";
 
 type AuthShellProps = {
   title: string;
@@ -18,38 +19,29 @@ export function AuthShell({
   wide = false,
 }: AuthShellProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-teal-50/40 to-zinc-50 font-sans text-zinc-900">
+    <div className="min-h-[calc(100vh-4.5rem)] bg-[#FAFAFA] font-sans flex flex-col">
       <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(20,184,166,0.12),transparent)]"
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(168,85,247,0.08),transparent)]"
         aria-hidden
       />
       <div
-        className={`relative mx-auto flex min-h-screen flex-col justify-center px-4 py-10 sm:px-6 ${wide ? "max-w-2xl" : "max-w-lg"}`}
+        className={`relative mx-auto flex flex-1 flex-col justify-center px-4 py-10 sm:px-6 w-full ${wide ? "max-w-3xl" : "max-w-xl"}`}
       >
-        <Link
-          href="/"
-          className="mb-8 flex items-center justify-center gap-2 self-center text-lg font-semibold tracking-tight text-zinc-900 sm:justify-start"
-        >
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 text-sm font-bold text-white shadow-sm"
-            aria-hidden
-          >
-            TR
-          </span>
-          Thapar Roommate Finder
-        </Link>
-
-        <div className="rounded-2xl border border-zinc-200/80 bg-white/90 p-6 shadow-xl shadow-zinc-200/50 backdrop-blur-sm sm:p-8">
-          <div className="text-center sm:text-left">
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
-              {title}
-            </h1>
-            <p className="mt-2 text-sm text-zinc-600">{subtitle}</p>
+        <RevealOnScroll effect="fade-up">
+          <div className="rounded-[2rem] border border-slate-200/60 bg-white/95 p-8 shadow-xl shadow-slate-200/50 backdrop-blur-md sm:p-10 transition-all hover:shadow-2xl hover:border-purple-200/50">
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                {title}
+              </h1>
+              <p className="mt-3 text-base text-slate-600 font-medium">{subtitle}</p>
+            </div>
+            <div className="mt-10">{children}</div>
           </div>
-          <div className="mt-8">{children}</div>
-        </div>
+        </RevealOnScroll>
 
-        <p className="mt-8 text-center text-sm text-zinc-600">{footer}</p>
+        <RevealOnScroll effect="fade-in" delayMs={200}>
+          <p className="mt-8 text-center text-sm font-medium text-slate-600">{footer}</p>
+        </RevealOnScroll>
       </div>
     </div>
   );

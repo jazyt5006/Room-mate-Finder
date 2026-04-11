@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { calculateCompatibilityScore } from "@/lib/compatibility-score";
-import { sampleYou } from "@/lib/dummy-users";
 import { formatHostelPreference } from "@/lib/hostel-labels";
+import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import {
   profileToCompatibilityTraits,
   type ProfileRow,
@@ -30,32 +30,37 @@ function scoreAccent(score: number): {
   ring: string;
   badge: string;
   glow: string;
+  bgGradient: string;
 } {
   if (score >= 80) {
     return {
-      ring: "from-emerald-400 to-teal-500",
-      badge: "bg-emerald-600 text-white shadow-emerald-500/35",
-      glow: "shadow-[0_0_40px_-8px_rgba(16,185,129,0.45)]",
+      ring: "from-purple-400 to-pink-500",
+      badge: "bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-purple-500/40",
+      glow: "shadow-[0_0_40px_-8px_rgba(168,85,247,0.4)]",
+      bgGradient: "from-purple-100/80 to-pink-50/50",
     };
   }
   if (score >= 60) {
     return {
-      ring: "from-teal-400 to-cyan-500",
-      badge: "bg-teal-600 text-white shadow-teal-500/35",
-      glow: "shadow-[0_0_40px_-8px_rgba(20,184,166,0.4)]",
+      ring: "from-indigo-400 to-purple-400",
+      badge: "bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-indigo-500/35",
+      glow: "shadow-[0_0_40px_-8px_rgba(99,102,241,0.35)]",
+      bgGradient: "from-indigo-100/80 to-purple-50/50",
     };
   }
   if (score >= 40) {
     return {
-      ring: "from-amber-400 to-orange-400",
-      badge: "bg-amber-600 text-white shadow-amber-500/30",
-      glow: "shadow-[0_0_36px_-8px_rgba(245,158,11,0.35)]",
+      ring: "from-rose-400 to-orange-400",
+      badge: "bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-rose-500/30",
+      glow: "shadow-[0_0_36px_-8px_rgba(244,63,94,0.3)]",
+      bgGradient: "from-rose-100/80 to-orange-50/50",
     };
   }
   return {
-    ring: "from-zinc-300 to-zinc-400",
-    badge: "bg-zinc-700 text-white shadow-zinc-500/25",
-    glow: "shadow-[0_0_28px_-10px_rgba(113,113,122,0.35)]",
+    ring: "from-slate-300 to-slate-400",
+    badge: "bg-gradient-to-br from-slate-500 to-slate-600 text-white shadow-slate-500/25",
+    glow: "shadow-[0_0_28px_-10px_rgba(100,116,139,0.3)]",
+    bgGradient: "from-slate-100 to-slate-50/50",
   };
 }
 
@@ -65,33 +70,33 @@ function MatchCard({ user, rank }: { user: RankedProfile; rank: number }) {
   const accent = scoreAccent(user.score);
   return (
     <article
-      className={`group relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-lg shadow-zinc-200/40 transition duration-300 hover:border-teal-200/80 hover:shadow-xl hover:shadow-teal-100/50 sm:p-6 ${accent.glow}`}
+      className={`group relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all duration-500 hover:-translate-y-2 hover:border-purple-200 hover:shadow-2xl ${accent.glow}`}
     >
       <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent.ring} opacity-90`}
+        className={`pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${accent.ring} opacity-90`}
         aria-hidden
       />
 
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-stretch sm:justify-between sm:gap-6">
-        <div className="flex min-w-0 flex-1 gap-4">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-stretch sm:justify-between">
+        <div className="flex min-w-0 flex-1 gap-5">
           <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-100 to-emerald-50 text-base font-bold tracking-tight text-teal-800 ring-2 ring-white shadow-inner shadow-teal-900/5"
+            className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.25rem] bg-gradient-to-br ${accent.bgGradient} text-xl font-extrabold tracking-tight text-slate-800 ring-4 ring-white shadow-inner shadow-slate-900/5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}
             aria-hidden
           >
             {initials(user.full_name)}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-semibold tracking-tight text-zinc-900">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900">
                 {user.full_name}
               </h2>
-              <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+              <span className="rounded-full bg-slate-100 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-600 shadow-sm border border-slate-200">
                 #{rank} match
               </span>
             </div>
-            <p className="mt-1 text-sm text-zinc-600">
-              <span className="font-medium text-zinc-800">{user.branch}</span>
-              <span className="mx-1.5 text-zinc-300" aria-hidden>
+            <p className="mt-1 text-sm font-medium text-slate-500">
+              <span className="text-slate-700">{user.branch}</span>
+              <span className="mx-2 text-slate-300" aria-hidden>
                 ·
               </span>
               <span>
@@ -99,20 +104,20 @@ function MatchCard({ user, rank }: { user: RankedProfile; rank: number }) {
               </span>
             </p>
 
-            <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl bg-zinc-50/90 px-4 py-3 ring-1 ring-zinc-100/80">
-                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+            <dl className="mt-5 grid gap-4 grid-cols-2">
+              <div className="rounded-2xl bg-slate-50 border border-slate-100/80 px-4 py-3 shadow-inner">
+                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   CGPA
                 </dt>
-                <dd className="mt-0.5 text-lg font-semibold tabular-nums text-zinc-900">
+                <dd className="mt-1 text-lg font-extrabold tabular-nums text-slate-800">
                   {user.cgpa}
                 </dd>
               </div>
-              <div className="rounded-2xl bg-zinc-50/90 px-4 py-3 ring-1 ring-zinc-100/80">
-                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Hostel preference
+              <div className="rounded-2xl bg-slate-50 border border-slate-100/80 px-4 py-3 shadow-inner">
+                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Hostel pref
                 </dt>
-                <dd className="mt-0.5 text-sm font-medium leading-snug text-zinc-800">
+                <dd className="mt-1 text-sm font-bold leading-snug text-slate-800">
                   {formatHostelPreference(user.hostel_preference ?? "")}
                 </dd>
               </div>
@@ -120,15 +125,15 @@ function MatchCard({ user, rank }: { user: RankedProfile; rank: number }) {
           </div>
         </div>
 
-        <div className="flex flex-col items-stretch justify-center sm:w-[148px] sm:shrink-0">
+        <div className="flex flex-col items-center justify-center sm:w-[160px] sm:shrink-0 mt-2 sm:mt-0">
           <div
-            className={`flex flex-col items-center justify-center rounded-2xl px-5 py-4 text-center shadow-lg ${accent.badge}`}
+            className={`flex flex-col items-center justify-center rounded-[1.5rem] px-6 py-5 w-full text-center shadow-xl transition-transform duration-500 group-hover:scale-105 ${accent.badge}`}
           >
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
+            <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-white/90">
               Match
             </span>
             <span
-              className="mt-1 text-4xl font-bold tabular-nums tracking-tight"
+              className="mt-1 text-5xl font-extrabold tabular-nums tracking-tighter"
               aria-label={`${user.score} percent compatible`}
             >
               {user.score}%
@@ -142,32 +147,27 @@ function MatchCard({ user, rank }: { user: RankedProfile; rank: number }) {
 
 function MatchesEmptyState() {
   return (
-    <div className="mt-10 flex flex-col items-center rounded-3xl border border-dashed border-zinc-200 bg-gradient-to-b from-white to-zinc-50/80 px-6 py-14 text-center shadow-sm sm:px-10">
+    <div className="mt-10 flex flex-col items-center rounded-[2.5rem] border-2 border-dashed border-slate-200 bg-white/50 backdrop-blur-sm px-6 py-16 text-center shadow-sm sm:px-12">
       <div
-        className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-3xl shadow-inner ring-1 ring-teal-100"
+        className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-purple-100 to-pink-100 text-4xl shadow-inner ring-1 ring-purple-200 mb-2"
         aria-hidden
       >
         🤝
       </div>
-      <h2 className="mt-6 text-xl font-semibold tracking-tight text-zinc-900">
+      <h2 className="mt-6 text-2xl font-bold tracking-tight text-slate-900">
         No matches yet
       </h2>
-      <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-600">
+      <p className="mt-3 max-w-md text-base leading-relaxed text-slate-600 font-medium">
         You're one of the first ones here! Once other students add their profiles, they will show up ranked by how well their habits align with yours. 
       </p>
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+      <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center w-full max-w-xs">
         <Link
-          href="/signup"
-          className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-zinc-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:ring-offset-2"
+          href="/profile"
+          className="w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-500 py-3.5 text-sm font-bold text-white shadow-xl shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 inline-flex items-center justify-center"
         >
-          Invite others to sign up
+          Check your profile
         </Link>
       </div>
-      <p className="mt-8 text-xs text-zinc-500">
-        <Link href="/" className="font-medium text-teal-700 hover:underline">
-          Back to home
-        </Link>
-      </p>
     </div>
   );
 }
@@ -214,7 +214,7 @@ export function MatchesView() {
       const { data: rows, error: fetchError } = await supabase
         .from("profiles")
         .select(
-          "id, full_name, branch, year, cgpa, hostel_preference, cleanliness, sleep_cycle, social_habits, gender"
+           "id, full_name, branch, year, cgpa, hostel_preference, cleanliness, sleep_cycle, social_habits, gender"
         )
         .eq("gender", mine.gender)
         .eq("hostel_preference", mine.hostel_preference)
@@ -234,8 +234,6 @@ export function MatchesView() {
 
       let baseline = profileToCompatibilityTraits(mine as ProfileRow);
       let note = "Compared to your saved profile. You are not shown in the list below.";
-
-
 
       const scored: RankedProfile[] = others.map((user) => ({
         ...user,
@@ -267,64 +265,68 @@ export function MatchesView() {
   const showList = !loading && !error && ranked.length > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-teal-50/30 to-zinc-50 font-sans text-zinc-900">
-      <header className="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
-          <Link
-            href="/"
-            className="text-sm font-medium text-teal-700 hover:text-teal-800"
-          >
-            ← Home
-          </Link>
-          <span className="text-sm font-semibold text-zinc-500">
-            Compatibility matches
-          </span>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">
-          Compatibility matches
-        </h1>
-
-        {!loading && baselineNote ? (
-          <p className="mt-2 max-w-xl text-sm text-zinc-600">{baselineNote}</p>
-        ) : null}
-
-        {showList ? (
-          <p className="mt-3 text-xs font-medium uppercase tracking-wider text-zinc-400">
-            Sorted by match % · highest first
-          </p>
-        ) : null}
+    <div className="flex-1 w-full relative pb-20">
+      <div
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(168,85,247,0.08),transparent)]"
+        aria-hidden
+      />
+      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 relative z-10">
+        <RevealOnScroll effect="fade-up">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent inline-block pb-1">
+                Compatibility Matches
+              </h1>
+              {!loading && baselineNote && (
+                <p className="mt-3 max-w-xl text-base font-medium text-slate-500">{baselineNote}</p>
+              )}
+            </div>
+            {showList && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-purple-600 ring-1 ring-inset ring-purple-500/20 shadow-sm self-start md:self-auto">
+                <span className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-pulse" />
+                Ranked by alignment
+              </span>
+            )}
+          </div>
+        </RevealOnScroll>
 
         {error && (
-          <p
-            className="mt-6 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
-            role="alert"
-          >
-            {error}
-          </p>
+          <RevealOnScroll effect="fade-in">
+            <div
+              className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800 shadow-sm"
+              role="alert"
+            >
+              {error}
+            </div>
+          </RevealOnScroll>
         )}
 
         {loading && !error && (
-          <ul className="mt-8 space-y-5" aria-busy="true">
-            {[1, 2, 3].map((k) => (
-              <li
-                key={k}
-                className="h-44 animate-pulse rounded-3xl border border-zinc-200/90 bg-white/70 shadow-md"
-              />
+          <ul className="mt-10 space-y-6" aria-busy="true">
+            {[1, 2, 3].map((k, idx) => (
+              <RevealOnScroll key={k} effect="fade-up" delayMs={idx * 100}>
+                <li
+                  className="h-44 animate-pulse rounded-[2rem] border border-slate-200/90 bg-white shadow-xl shadow-slate-200/40"
+                />
+              </RevealOnScroll>
             ))}
           </ul>
         )}
 
-        {!loading && !error && ranked.length === 0 && <MatchesEmptyState />}
+        {!loading && !error && ranked.length === 0 && (
+          <RevealOnScroll effect="fade-up" delayMs={100}>
+            <MatchesEmptyState />
+          </RevealOnScroll>
+        )}
 
         {showList && (
-          <ul className="mt-8 space-y-5">
+          <ul className="mt-10 space-y-6">
             {ranked.map((user, i) => (
-              <li key={user.id}>
-                <MatchCard user={user} rank={i + 1} />
-              </li>
+              <RevealOnScroll key={user.id} effect="fade-up" delayMs={i * 100}>
+                <li>
+                  <MatchCard user={user} rank={i + 1} />
+                </li>
+              </RevealOnScroll>
             ))}
           </ul>
         )}

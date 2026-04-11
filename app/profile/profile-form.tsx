@@ -101,7 +101,7 @@ function SliderRow({
           <p className="mt-0.5 text-xs text-zinc-500">{hint}</p>
         </div>
         <span
-          className="tabular-nums text-lg font-semibold text-teal-700"
+          className="tabular-nums text-lg font-semibold text-purple-700"
           aria-live="polite"
         >
           {value}
@@ -115,7 +115,7 @@ function SliderRow({
         step={1}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-teal-600 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-600 [&::-webkit-slider-thumb]:shadow"
+        className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-purple-600 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:shadow"
         aria-valuemin={1}
         aria-valuemax={5}
         aria-valuenow={value}
@@ -287,7 +287,7 @@ export function ProfileForm() {
         <>
           <Link
             href="/"
-            className="font-semibold text-teal-700 underline-offset-4 hover:text-teal-800 hover:underline"
+            className="font-semibold text-purple-600 underline-offset-4 hover:text-purple-700 hover:underline"
           >
             Back to home
           </Link>
@@ -337,7 +337,7 @@ export function ProfileForm() {
                 setName(e.target.value);
                 patchField("name", e.target.value, validateName);
               }}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
               placeholder="e.g. Arjun Singh"
               aria-invalid={errors.name ? true : undefined}
             />
@@ -361,7 +361,7 @@ export function ProfileForm() {
                 setBranch(e.target.value);
                 patchField("branch", e.target.value, validateBranch);
               }}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
               aria-invalid={errors.branch ? true : undefined}
             >
               {BRANCH_OPTIONS.map((o) => (
@@ -390,7 +390,7 @@ export function ProfileForm() {
                 setYear(e.target.value);
                 patchField("year", e.target.value, validateYear);
               }}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
               aria-invalid={errors.year ? true : undefined}
             >
               {YEAR_OPTIONS.map((o) => (
@@ -419,7 +419,7 @@ export function ProfileForm() {
                 setGender(e.target.value);
                 patchField("gender", e.target.value, validateGender);
               }}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
               aria-invalid={errors.gender ? true : undefined}
             >
               <option value="">Select gender</option>
@@ -451,7 +451,7 @@ export function ProfileForm() {
                 setCgpa(e.target.value);
                 patchField("cgpa", e.target.value, validateCgpa);
               }}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
               placeholder="e.g. 8.5"
               aria-invalid={errors.cgpa ? true : undefined}
             />
@@ -481,7 +481,7 @@ export function ProfileForm() {
                   }));
                 }
               }}
-              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
               aria-invalid={errors.hostel ? true : undefined}
             >
               {HOSTEL_OPTIONS.map((o) => (
@@ -531,7 +531,7 @@ export function ProfileForm() {
         <button
           type="submit"
           disabled={saving || checkingExisting || Boolean(initialCheckError)}
-          className="w-full rounded-full bg-zinc-900 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
+          className="w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-500 py-3.5 text-base font-bold text-white shadow-xl shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save profile"}
         </button>

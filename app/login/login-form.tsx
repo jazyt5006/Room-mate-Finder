@@ -107,7 +107,7 @@ export function LoginForm() {
           Don&apos;t have an account?{" "}
           <Link
             href="/signup"
-            className="font-semibold text-teal-700 underline-offset-4 hover:text-teal-800 hover:underline"
+            className="font-semibold text-purple-600 underline-offset-4 hover:text-purple-700 hover:underline"
           >
             Sign up
           </Link>
@@ -115,7 +115,7 @@ export function LoginForm() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-        <div className="rounded-2xl border border-teal-100 bg-teal-50/70 px-4 py-3 text-sm text-teal-900">
+        <div className="rounded-2xl border border-purple-100 bg-purple-50/70 px-4 py-3 text-sm text-purple-900 font-medium">
           Only verified <span className="font-semibold">@thapar.edu</span>{" "}
           accounts can sign in.
         </div>
@@ -144,7 +144,7 @@ export function LoginForm() {
             onChange={(e) => onEmailChange(e.target.value)}
             aria-invalid={errors.email ? true : undefined}
             aria-describedby={errors.email ? "login-email-error" : undefined}
-            className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+            className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
             placeholder="you@thapar.edu"
             disabled={loading}
           />
@@ -173,7 +173,7 @@ export function LoginForm() {
             aria-describedby={
               errors.password ? "login-password-error" : undefined
             }
-            className="mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+            className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
             placeholder="Enter your password"
             disabled={loading}
           />
@@ -187,7 +187,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-zinc-900 py-3 text-base font-semibold text-white shadow-md transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
+          className="w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-500 py-3.5 text-base font-bold text-white shadow-xl shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           {loading ? "Signing in..." : "Log in"}
         </button>

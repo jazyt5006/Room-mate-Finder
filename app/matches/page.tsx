@@ -3,7 +3,7 @@ import { MatchesView } from "./matches-view";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Matches | Thapar Roommate Finder",
+  title: "Matches | TIET Roomie",
   description:
     "See how compatible you are with other students based on CGPA and living-style sliders.",
 };
