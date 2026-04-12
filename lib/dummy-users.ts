@@ -6,6 +6,9 @@ export const sampleYou: CompatibilityTraits = {
   cleanliness: 4,
   sleepCycle: 3,
   socialHabits: 3,
+  studyHabits: 3,
+  noiseTolerance: 3,
+  guestsFrequency: 3,
 };
 
 export type DummyUser = {
@@ -13,7 +16,10 @@ export type DummyUser = {
   name: string;
   branch: string;
   year: "1" | "2" | "3" | "4";
+  last_active?: string;
 } & CompatibilityTraits;
+
+const dummyNow = new Date().toISOString();
 
 export const dummyUsers: DummyUser[] = [
   {
@@ -25,6 +31,10 @@ export const dummyUsers: DummyUser[] = [
     cleanliness: 4,
     sleepCycle: 3,
     socialHabits: 3,
+    studyHabits: 4,
+    noiseTolerance: 3,
+    guestsFrequency: 2,
+    last_active: dummyNow,
   },
   {
     id: "u2",
@@ -35,6 +45,10 @@ export const dummyUsers: DummyUser[] = [
     cleanliness: 2,
     sleepCycle: 5,
     socialHabits: 5,
+    studyHabits: 2,
+    noiseTolerance: 5,
+    guestsFrequency: 5,
+    last_active: new Date(Date.now() - 2 * 86400000).toISOString(), // 2 days ago
   },
   {
     id: "u3",
@@ -45,6 +59,10 @@ export const dummyUsers: DummyUser[] = [
     cleanliness: 5,
     sleepCycle: 2,
     socialHabits: 2,
+    studyHabits: 5,
+    noiseTolerance: 1,
+    guestsFrequency: 1,
+    last_active: dummyNow,
   },
   {
     id: "u4",
@@ -55,6 +73,10 @@ export const dummyUsers: DummyUser[] = [
     cleanliness: 4,
     sleepCycle: 4,
     socialHabits: 4,
+    studyHabits: 3,
+    noiseTolerance: 4,
+    guestsFrequency: 3,
+    last_active: new Date(Date.now() - 5 * 3600000).toISOString(), // 5 hours ago
   },
   {
     id: "u5",
@@ -65,5 +87,9 @@ export const dummyUsers: DummyUser[] = [
     cleanliness: 3,
     sleepCycle: 3,
     socialHabits: 4,
+    studyHabits: 2,
+    noiseTolerance: 5,
+    guestsFrequency: 4,
+    last_active: dummyNow,
   },
 ];

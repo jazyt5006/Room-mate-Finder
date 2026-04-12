@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
-import { fetchProfileById, upsertProfile } from "@/lib/profiles";
+import { fetchProfileById, upsertProfile, calculateProfileCompletion } from "@/lib/profiles";
+import { ProfileProgress } from "@/components/profile-progress";
 import { supabase } from "@/lib/supabaseClient";
 import {
   validateBranch,
@@ -73,7 +74,7 @@ const YEAR_OPTIONS = [
   { value: "4", label: "4th year" },
 ] as const;
 
-type SliderField = "cleanliness" | "sleepCycle" | "socialHabits";
+type SliderField = "cleanliness" | "sleepCycle" | "socialHabits" | "studyHabits" | "noiseTolerance" | "guestsFrequency";
 
 function SliderRow({
   id,
@@ -143,6 +144,9 @@ export function ProfileForm() {
   const [cleanliness, setCleanliness] = useState(3);
   const [sleepCycle, setSleepCycle] = useState(3);
   const [socialHabits, setSocialHabits] = useState(3);
+  const [studyHabits, setStudyHabits] = useState(3);
+  const [noiseTolerance, setNoiseTolerance] = useState(3);
+  const [guestsFrequency, setGuestsFrequency] = useState(3);
 
   const [errors, setErrors] = useState<{
     name?: string;
@@ -208,6 +212,9 @@ export function ProfileForm() {
         cleanliness: setCleanliness,
         sleepCycle: setSleepCycle,
         socialHabits: setSocialHabits,
+        studyHabits: setStudyHabits,
+        noiseTolerance: setNoiseTolerance,
+        guestsFrequency: setGuestsFrequency,
       } as const;
       setters[field](n);
     },
@@ -256,6 +263,9 @@ export function ProfileForm() {
         cleanliness,
         sleep_cycle: sleepCycle,
         social_habits: socialHabits,
+        study_habits: studyHabits,
+        noise_tolerance: noiseTolerance,
+        guests_frequency: guestsFrequency,
       });
 
       if (error) {
@@ -278,6 +288,21 @@ export function ProfileForm() {
     setErrors((prev) => ({ ...prev, [key]: validate(value) }));
   }
 
+  const completion = calculateProfileCompletion({
+    full_name: name,
+    branch,
+    year: Number(year),
+    cgpa: Number(cgpa),
+    hostel_preference: hostel,
+    gender,
+    cleanliness,
+    sleep_cycle: sleepCycle,
+    social_habits: socialHabits,
+    study_habits: studyHabits,
+    noise_tolerance: noiseTolerance,
+    guests_frequency: guestsFrequency,
+  } as any);
+
   return (
     <AuthShell
       wide
@@ -294,6 +319,10 @@ export function ProfileForm() {
         </>
       }
     >
+      <div className="mb-8">
+        <ProfileProgress percentage={completion} />
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         {checkingExisting && (
           <p
@@ -524,6 +553,38 @@ export function ProfileForm() {
               hint="1 = quiet / private · 5 = very social"
               value={socialHabits}
               onChange={(n) => setSlider("socialHabits", n)}
+            />
+          </div>
+        </div>
+
+        <div className="border-t border-zinc-200 pt-6">
+          <h2 className="text-sm font-semibold text-zinc-900">
+            Behavioral traits (1 = low, 5 = high)
+          </h2>
+          <p className="mt-1 text-xs text-zinc-500">
+            Helps us find roommates with matching boundaries.
+          </p>
+          <div className="mt-6 space-y-8">
+            <SliderRow
+              id={`${formId}-study`}
+              label="Study habits"
+              hint="1 = rarely studies · 5 = studies frequently"
+              value={studyHabits}
+              onChange={(n) => setSlider("studyHabits", n)}
+            />
+            <SliderRow
+              id={`${formId}-noise`}
+              label="Noise tolerance"
+              hint="1 = needs silence · 5 = okay with noise"
+              value={noiseTolerance}
+              onChange={(n) => setSlider("noiseTolerance", n)}
+            />
+            <SliderRow
+              id={`${formId}-guests`}
+              label="Guests frequency"
+              hint="1 = rarely invites guests · 5 = often invites guests"
+              value={guestsFrequency}
+              onChange={(n) => setSlider("guestsFrequency", n)}
             />
           </div>
         </div>

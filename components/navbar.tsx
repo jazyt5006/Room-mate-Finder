@@ -8,6 +8,7 @@ const navLinks: NavItem[] = [
   { href: "/#features", label: "Features" },
   { href: "/#how-it-works", label: "How it works" },
   { href: "/matches", label: "Matches", route: true },
+  { href: "/connections", label: "Connections", route: true },
   { href: "/profile", label: "Profile", route: true },
 ];
 
